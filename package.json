@@ -6,34 +6,70 @@
   "icon": "extension-icon.png",
   "author": "smilemachine",
   "owner": "nand-gate",
+  "type": "module",
   "categories": [
     "Productivity"
   ],
   "license": "MIT",
+  "preferences": [
+    {
+      "name": "project-directory",
+      "title": "Project Directory",
+      "description": "The directory to save projects to",
+      "type": "directory",
+      "default": "~/Projects",
+      "required": true
+    },
+    {
+      "name": "tag-command",
+      "title": "Tag Command",
+      "description": "Where is the tag command located? Use `which tag` to find it.",
+      "type": "textfield",
+      "default": "/opt/homebrew/bin/tag"
+    },
+    {
+      "name": "code-editor",
+      "title": "Code Editor",
+      "description": "Which code editor do you want to use?",
+      "type": "textfield",
+      "default": "Code"
+    },
+    {
+      "name": "terminal",
+      "title": "Terminal",
+      "description": "Which terminal do you want to use?",
+      "type": "textfield",
+      "default": "iTerm"
+    }
+  ],
   "commands": [
     {
       "name": "create-project",
       "title": "Create Project",
-      "description": "",
+      "description": "Create a new project folder",
       "mode": "view"
     },
     {
       "name": "list-projects",
       "title": "List Projects",
-      "description": "",
+      "description": "List all projects in the project directory",
       "mode": "view"
     }
   ],
   "dependencies": {
     "@raycast/api": "^1.93.2",
-    "@raycast/utils": "^1.17.0"
+    "@raycast/utils": "^1.17.0",
+    "dayjs": "^1.11.13"
   },
   "devDependencies": {
     "@raycast/eslint-config": "^1.0.11",
+    "@types/expand-tilde": "^2.0.2",
     "@types/node": "20.8.10",
     "@types/react": "18.3.3",
     "eslint": "^8.57.0",
+    "expand-tilde": "^2.0.2",
     "prettier": "^3.3.3",
+    "tsx": "^4.19.3",
     "typescript": "^5.4.5"
   },
   "scripts": {
