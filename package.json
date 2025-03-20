@@ -2,7 +2,7 @@
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "project-manager",
   "title": "Project Manager",
-  "description": "",
+  "description": "This extension helps you manage your projects. It allows you to create projects, list projects, and tag projects.",
   "icon": "doc-logo6.png",
   "author": "smilemachine",
   "owner": "nand-gate",

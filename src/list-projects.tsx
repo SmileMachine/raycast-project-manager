@@ -1,41 +1,65 @@
-import { ActionPanel, Detail, List, Action, Icon, Keyboard } from "@raycast/api";
-import { Form, ActionPanel, Action, showToast, Toast, List, Icon, Color } from "@raycast/api";
-import { getPreferenceValues } from "@raycast/api";
+import {
+  ActionPanel,
+  List,
+  Action,
+  Icon,
+  Keyboard,
+  Form,
+  showToast,
+  Toast,
+  getPreferenceValues,
+  useNavigation,
+} from "@raycast/api";
 import { usePromise } from "@raycast/utils";
 import fs from "fs";
-import path, { basename } from "path";
-import { setTags, getTags } from "./file-tag";
+import path from "path";
 import dayjs from "dayjs";
-import { useState } from "react";
-import { colorCircles } from "./color-circles";
-import { ColorTagPicker } from "./utils";
+import { useMemo, useState } from "react";
+import { setTags, getTags } from "./file-tag";
+import { colorCircles, ColorTags, ColorTagPicker } from "./color-circles";
 
 type Project = {
   name: string;
   date: string;
   path: string;
-  tags: string[];
+  tags: ColorTags[];
 };
 
-function EditTags(props: { project: Project }) {
+function EditTags({ project, onComplete }: { project: Project; onComplete: () => void }) {
+  const navigation = useNavigation();
+  const editTags = ({ tags }: { tags: ColorTags[] }) => {
+    setTags(project.path, tags)
+      .then(() => {
+        project.tags = tags;
+        showToast({
+          title: "Tags updated",
+          style: Toast.Style.Success,
+        });
+        onComplete();
+        navigation.pop();
+      })
+      .catch((error) => {
+        showToast({
+          title: "Error updating tags",
+          style: Toast.Style.Failure,
+          message: error.message,
+        });
+      });
+  };
   return (
     <Form
       actions={
         <ActionPanel>
-          <Action.SubmitForm
-            onSubmit={(values) => {
-              console.log(values);
-            }}
-          />
+          <Action.SubmitForm onSubmit={editTags} />
         </ActionPanel>
       }
     >
-      {ColorTagPicker(props.project.tags)}
+      <ColorTagPicker defaultTags={project.tags} />
     </Form>
   );
 }
 
-function projSection(tag: string, projects: Project[]) {
+function ProjectSection({ tag, projects, refresh }: { tag: string; projects: Project[]; refresh: () => void }) {
   const codeEditor = getPreferenceValues()["code-editor"];
   const terminal = getPreferenceValues()["terminal"];
   const projectDirectory = getPreferenceValues()["project-directory"];
@@ -44,10 +68,18 @@ function projSection(tag: string, projects: Project[]) {
       {projects.map((project) => (
         <List.Item
           key={project.path}
-          icon={colorCircles[project.tags[0] as keyof typeof colorCircles]}
+          icon={colorCircles[tag as keyof typeof colorCircles]}
+          keywords={[project.date]}
           title={project.name}
-          subtitle={project.date}
           detail={<List.Item.Detail markdown={project.tags.join(", ")} />}
+          accessories={[
+            ...project.tags
+              .filter((t) => t !== tag)
+              .map((tag) => ({
+                icon: colorCircles[tag as keyof typeof colorCircles],
+              })),
+            { tag: project.date },
+          ]}
           actions={
             <ActionPanel>
               <Action.Open
@@ -59,7 +91,7 @@ function projSection(tag: string, projects: Project[]) {
               <Action.Open title="Open in Finder" target={project.path} />
               <Action.Push
                 title="Edit Tags"
-                target={<EditTags project={project} />}
+                target={<EditTags project={project} onComplete={refresh} />}
                 shortcut={Keyboard.Shortcut.Common.Edit}
                 icon={Icon.Pencil}
               />
@@ -78,31 +110,46 @@ function projSection(tag: string, projects: Project[]) {
   );
 }
 
+function processProjects(projects: Project[]) {
+  const uniqueTags = Object.values(ColorTags);
+  const noneProjects = projects.filter((project) => project.tags.length === 0);
+  return Object.fromEntries([
+    ...uniqueTags.map((tag) => [tag, projects.filter((project) => project.tags.includes(tag))]),
+    ["None", noneProjects],
+  ]);
+}
 export default function Command() {
-  const projectDirectory = getPreferenceValues()["project-directory"];
+  const projDir = getPreferenceValues()["project-directory"];
+  const [refreshKey, setRefreshKey] = useState(0);
+  const refresh = () => setRefreshKey(refreshKey + 1);
   const { isLoading, data: projects } = usePromise(
     async () =>
       Promise.all(
         fs
-          .readdirSync(projectDirectory)
+          .readdirSync(projDir)
           .filter((project) => dayjs(project.substring(0, 10)).isValid())
           .map(async (project) => ({
             name: project.substring(11),
             date: dayjs(project.substring(0, 10)).format("YYYY-MM-DD"),
-            path: path.join(projectDirectory, project),
-            tags: await getTags(path.join(projectDirectory, project)),
+            path: path.join(projDir, project),
+            tags: (await getTags(path.join(projDir, project))).map((tag) => tag as ColorTags),
           })),
-      )
-        .then((projects) => projects.sort((a, b) => b.date.localeCompare(a.date)))
-        .then((projects) => {
-          const tags = projects.map((project) => project.tags).flat();
-          const uniqueTags = [...new Set(tags)];
-          return Object.fromEntries(
-            uniqueTags.map((tag) => [tag, projects.filter((project) => project.tags.includes(tag))]),
-          );
-        }),
+      ).then((projects) => projects.sort((a, b) => b.date.localeCompare(a.date))),
     [],
   );
+
+  const [selectedTag, setSelectedTag] = useState<ColorTags | "All" | "None">("All");
+  const filteredProjects = useMemo((): Record<string, Project[]> => {
+    if (!projects) {
+      return {};
+    }
+    const processedProjects = processProjects(projects);
+    if (selectedTag === "All") {
+      return processedProjects;
+    } else {
+      return { [selectedTag]: processedProjects[selectedTag] || [] };
+    }
+  }, [projects, selectedTag, refreshKey]);
   return (
     <List
       isLoading={isLoading}
@@ -110,21 +157,26 @@ export default function Command() {
       searchBarAccessory={
         <List.Dropdown
           tooltip="Select Tag"
-          storeValue={true}
+          defaultValue={selectedTag}
           onChange={(newValue) => {
-            // console.log(newValue);
+            setSelectedTag(newValue as ColorTags | "All" | "None");
           }}
         >
-          {["Blue", "Green", "Red", "Yellow"].map((tag) => (
-            <List.Dropdown.Item key={tag} title={tag} value={tag} />
+          {["All", ...Object.values(ColorTags), "None"].map((tag) => (
+            <List.Dropdown.Item
+              key={tag}
+              title={tag}
+              value={tag}
+              icon={colorCircles[tag as keyof typeof colorCircles]}
+            />
           ))}
         </List.Dropdown>
       }
     >
-      {projects ? (
-        Object.entries(projects).map(([tag, projects]) => {
-          return projSection(tag, projects);
-        })
+      {Object.keys(filteredProjects).length > 0 ? (
+        Object.entries(filteredProjects).map(([tag, projects]) => (
+          <ProjectSection key={tag} tag={tag} projects={projects} refresh={refresh} />
+        ))
       ) : (
         <List.EmptyView title="No projects" description="Add a project to get started" icon={Icon.MagnifyingGlass} />
       )}

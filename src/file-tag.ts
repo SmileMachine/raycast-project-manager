@@ -31,13 +31,17 @@ function spawnAsync(command: string, args: string[], options = {}): Promise<{ st
   });
 }
 
-// To use this command, you need to install the `tag` 
+// To use this command, you need to install the `tag`
 // via `brew install tag` or `port install tag`
 const TAG_COMMAND = getPreferenceValues()["tag-command"];
 async function getTags(path: string): Promise<string[]> {
   path = expandTilde(path);
   const { stdout } = await spawnAsync(TAG_COMMAND, ["-Nl", path]);
-  return stdout.trim().split(",").map((tag) => tag.trim()).filter(Boolean);
+  return stdout
+    .trim()
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter(Boolean);
 }
 
 async function setTags(path: string, tags: string[]) {

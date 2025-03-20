@@ -1,11 +1,10 @@
-import { Form, ActionPanel, Action, showToast, Toast, List } from "@raycast/api";
+import { Form, ActionPanel, Action, showToast, Toast, List, getPreferenceValues } from "@raycast/api";
 import fs from "fs";
-import { getPreferenceValues } from "@raycast/api";
 import path, { basename } from "path";
-import { setTags } from "./file-tag";
 import dayjs from "dayjs";
 import { useState } from "react";
-import { ColorTagPicker } from "./utils";
+import { setTags } from "./file-tag";
+import { ColorTagPicker, ColorTags } from "./color-circles";
 
 type Values = {
   textfield: string;
@@ -85,7 +84,7 @@ export default function Command() {
     >
       <Form.TextField id="textfield" title="Name" placeholder="Enter name" />
       <Form.DatePicker id="datepicker" title="Date" defaultValue={new Date()} type={Form.DatePicker.Type.Date} />
-      {ColorTagPicker(["Blue"])}
+      <ColorTagPicker defaultTags={[ColorTags.Blue]} />
     </Form>
   );
 }
