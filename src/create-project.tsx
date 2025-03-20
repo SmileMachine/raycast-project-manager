@@ -9,7 +9,7 @@ import { ColorTagPicker, ColorTags } from "./color-circles";
 type Values = {
   textfield: string;
   datepicker: Date;
-  color: string[];
+  tags: ColorTags[];
 };
 
 export default function Command() {
@@ -21,7 +21,7 @@ export default function Command() {
   const projectDirectory = getPreferenceValues()["project-directory"];
 
   function handleSubmit(values: Values) {
-    const name = values.textfield.replace(/ /g, "_");
+    const name = values.textfield.replace(/\s/g, "_");
     const date = dayjs(values.datepicker).format("YYYY-MM-DD");
     const projectName = `${date}-${name}`;
     const projectPath = path.join(projectDirectory, projectName);
@@ -31,10 +31,10 @@ export default function Command() {
         showToast({
           style: Toast.Style.Failure,
           title: "Error",
-          message: err?.message || "Failed to create project directory",
+          message: err?.message || `Failed to create project directory: ${projectPath}`,
         });
       } else {
-        setTags(path, values.color).then(() => {
+        setTags(path, values.tags).then(() => {
           setProjectName(basename(projectPath));
           setProjectPath(projectPath);
           setSubmitted(true);
