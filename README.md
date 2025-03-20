@@ -1,5 +1,7 @@
 # Project Manager
 
+[中文](./README.zh-cn.md)
+
 This raycast extension helps you manage your projects. It allows you to create projects, list projects, and tag projects.
 
 ## Overview
@@ -17,6 +19,10 @@ The tags will be used to color the project in the list view, these tags will als
 You can choose to open the project with your favorite code editor, terminal, or finder.
 
 ![After Creation](./metadata/project-manager-3.png)
+
+The folder will be created in the project directory.
+
+![Finder](./metadata/project-manager-5.jpg)
 
 ### List Projects
 
