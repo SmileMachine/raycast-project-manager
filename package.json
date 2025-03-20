@@ -3,7 +3,7 @@
   "name": "project-manager",
   "title": "Project Manager",
   "description": "",
-  "icon": "extension-icon.png",
+  "icon": "doc-logo6.png",
   "author": "smilemachine",
   "owner": "nand-gate",
   "type": "module",
@@ -25,21 +25,24 @@
       "title": "Tag Command",
       "description": "Where is the tag command located? Use `which tag` to find it.",
       "type": "textfield",
-      "default": "/opt/homebrew/bin/tag"
+      "default": "/opt/homebrew/bin/tag",
+      "required": true
     },
     {
       "name": "code-editor",
       "title": "Code Editor",
       "description": "Which code editor do you want to use?",
       "type": "textfield",
-      "default": "Code"
+      "default": "Code",
+      "required": true
     },
     {
       "name": "terminal",
       "title": "Terminal",
       "description": "Which terminal do you want to use?",
       "type": "textfield",
-      "default": "iTerm"
+      "default": "iTerm",
+      "required": true
     }
   ],
   "commands": [

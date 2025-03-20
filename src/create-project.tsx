@@ -1,10 +1,11 @@
-import { Form, ActionPanel, Action, showToast, Toast, List, Icon, Color } from "@raycast/api";
+import { Form, ActionPanel, Action, showToast, Toast, List } from "@raycast/api";
 import fs from "fs";
 import { getPreferenceValues } from "@raycast/api";
 import path, { basename } from "path";
 import { setTags } from "./file-tag";
 import dayjs from "dayjs";
 import { useState } from "react";
+import { ColorTagPicker } from "./utils";
 
 type Values = {
   textfield: string;
@@ -21,8 +22,9 @@ export default function Command() {
   const projectDirectory = getPreferenceValues()["project-directory"];
 
   function handleSubmit(values: Values) {
+    const name = values.textfield.replace(/ /g, "_");
     const date = dayjs(values.datepicker).format("YYYY-MM-DD");
-    const projectName = `${date}-${values.textfield}`;
+    const projectName = `${date}-${name}`;
     const projectPath = path.join(projectDirectory, projectName);
 
     fs.mkdir(projectPath, { recursive: true }, (err, path) => {
@@ -83,16 +85,7 @@ export default function Command() {
     >
       <Form.TextField id="textfield" title="Name" placeholder="Enter name" />
       <Form.DatePicker id="datepicker" title="Date" defaultValue={new Date()} type={Form.DatePicker.Type.Date} />
-      <Form.TagPicker id="color" title="Tag Color" defaultValue={["Red"]}>
-        <Form.TagPicker.Item value="Red" title="Red" icon={{ source: Icon.CircleFilled, tintColor: Color.Red }} />
-        <Form.TagPicker.Item value="Green" title="Green" icon={{ source: Icon.CircleFilled, tintColor: Color.Green }} />
-        <Form.TagPicker.Item value="Blue" title="Blue" icon={{ source: Icon.CircleFilled, tintColor: Color.Blue }} />
-        <Form.TagPicker.Item
-          value="Yellow"
-          title="Yellow"
-          icon={{ source: Icon.CircleFilled, tintColor: { light: "#E7B400", dark: "#E7B400", adjustContrast: false } }}
-        />
-      </Form.TagPicker>
+      {ColorTagPicker(["Blue"])}
     </Form>
   );
 }
