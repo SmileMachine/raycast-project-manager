@@ -1,4 +1,4 @@
-import { Form, ActionPanel, Action, showToast, Toast, List, getPreferenceValues } from "@raycast/api";
+import { Form, ActionPanel, Action, showToast, Toast, List, getPreferenceValues, Keyboard } from "@raycast/api";
 import fs from "fs";
 import path, { basename } from "path";
 import dayjs from "dayjs";
@@ -57,18 +57,23 @@ export default function Command() {
         actions={
           <ActionPanel>
             <Action.Open
-              title={`Open with ${codeEditor}`}
+              title={`Open with ${codeEditor.name}`}
               target={projectPath}
               application={codeEditor}
-              icon={{ fileIcon: `/Applications/${codeEditor}.app` }}
+              icon={{ fileIcon: codeEditor.path }}
             />
             <Action.Open title="Open in Finder" target={projectPath} />
             <Action.Open title="Open Project Directory" target={projectDirectory} />
             <Action.Open
-              title={`Open in ${terminal}`}
+              title={`Open in ${terminal.name}`}
               target={projectPath}
               application={terminal}
-              icon={{ fileIcon: `/Applications/${terminal}.app` }}
+              icon={{ fileIcon: terminal.path }}
+            />
+            <Action.CopyToClipboard
+              title="Copy Project Name"
+              content={projectName}
+              shortcut={Keyboard.Shortcut.Common.Copy}
             />
           </ActionPanel>
         }

@@ -32,15 +32,15 @@
       "name": "code-editor",
       "title": "Code Editor",
       "description": "Which code editor do you want to use?",
-      "type": "textfield",
-      "default": "Code",
+      "type": "appPicker",
+      "default": "Visual Studio Code",
       "required": true
     },
     {
       "name": "terminal",
       "title": "Terminal",
       "description": "Which terminal do you want to use?",
-      "type": "textfield",
+      "type": "appPicker",
       "default": "iTerm",
       "required": true
     }

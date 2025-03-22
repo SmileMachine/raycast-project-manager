@@ -83,10 +83,10 @@ function ProjectSection({ tag, projects, refresh }: { tag: string; projects: Pro
           actions={
             <ActionPanel>
               <Action.Open
-                title={`Open with ${codeEditor}`}
+                title={`Open with ${codeEditor.name}`}
                 target={project.path}
                 application={codeEditor}
-                icon={{ fileIcon: `/Applications/${codeEditor}.app` }}
+                icon={{ fileIcon: codeEditor.path }}
               />
               <Action.Open title="Open in Finder" target={project.path} />
               <Action.Push
@@ -95,12 +95,17 @@ function ProjectSection({ tag, projects, refresh }: { tag: string; projects: Pro
                 shortcut={Keyboard.Shortcut.Common.Edit}
                 icon={Icon.Pencil}
               />
-              <Action.Open title="Open Project Directory" target={projectDirectory} />
               <Action.Open
-                title={`Open in ${terminal}`}
+                title={`Open in ${terminal.name}`}
                 target={project.path}
                 application={terminal}
-                icon={{ fileIcon: `/Applications/${terminal}.app` }}
+                icon={{ fileIcon: terminal.path }}
+              />
+              <Action.Open title="Open Project Directory" target={projectDirectory} />
+              <Action.CopyToClipboard
+                title="Copy Project Path"
+                content={project.path}
+                shortcut={Keyboard.Shortcut.Common.Copy}
               />
             </ActionPanel>
           }
