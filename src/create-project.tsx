@@ -41,7 +41,7 @@ export default function Command() {
           showToast({
             style: Toast.Style.Success,
             title: "Created!",
-            message: `Enter to open with ${codeEditor}`,
+            message: `Enter to open with ${codeEditor.name}`,
           });
         });
       }
