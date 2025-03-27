@@ -62,6 +62,7 @@ export default function Command() {
               application={codeEditor}
               icon={{ fileIcon: codeEditor.path }}
             />
+            <Action.OpenWith path={projectPath} />
             <Action.Open title="Open in Finder" target={projectPath} />
             <Action.Open title="Open Project Directory" target={projectDirectory} />
             <Action.Open
@@ -74,6 +75,10 @@ export default function Command() {
               title="Copy Project Name"
               content={projectName}
               shortcut={Keyboard.Shortcut.Common.Copy}
+            />
+            <Action.CopyToClipboard
+              title="Copy Project Path"
+              content={projectPath}
             />
           </ActionPanel>
         }

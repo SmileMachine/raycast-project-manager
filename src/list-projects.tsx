@@ -12,7 +12,7 @@ import {
 } from "@raycast/api";
 import { usePromise } from "@raycast/utils";
 import fs from "fs";
-import path from "path";
+import path, { basename } from "path";
 import dayjs from "dayjs";
 import { useMemo, useState } from "react";
 import { setTags, getTags } from "./file-tag";
@@ -95,6 +95,7 @@ function ProjectSection({ tag, projects, refresh }: { tag: string; projects: Pro
                 shortcut={Keyboard.Shortcut.Common.Edit}
                 icon={Icon.Pencil}
               />
+              <Action.OpenWith path={project.path}/>
               <Action.Open
                 title={`Open in ${terminal.name}`}
                 target={project.path}
@@ -106,6 +107,10 @@ function ProjectSection({ tag, projects, refresh }: { tag: string; projects: Pro
                 title="Copy Project Path"
                 content={project.path}
                 shortcut={Keyboard.Shortcut.Common.Copy}
+              />
+              <Action.CopyToClipboard
+                title="Copy Project Name"
+                content={basename(project.path)}
               />
             </ActionPanel>
           }
