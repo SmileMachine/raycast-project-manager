@@ -62,7 +62,6 @@ function EditTags({ project, onComplete }: { project: Project; onComplete: () =>
 function ProjectSection({ tag, projects, refresh }: { tag: string; projects: Project[]; refresh: () => void }) {
   const codeEditor = getPreferenceValues()["code-editor"];
   const terminal = getPreferenceValues()["terminal"];
-  const projectDirectory = getPreferenceValues()["project-directory"];
   return (
     <List.Section key={tag} title={tag}>
       {projects.map((project) => (
@@ -88,30 +87,27 @@ function ProjectSection({ tag, projects, refresh }: { tag: string; projects: Pro
                 application={codeEditor}
                 icon={{ fileIcon: codeEditor.path }}
               />
-              <Action.Open title="Open in Finder" target={project.path} />
+              <Action.ShowInFinder title="Show in Finder" path={project.path} />
               <Action.Push
                 title="Edit Tags"
                 target={<EditTags project={project} onComplete={refresh} />}
                 shortcut={Keyboard.Shortcut.Common.Edit}
                 icon={Icon.Pencil}
               />
-              <Action.OpenWith path={project.path}/>
+              <Action.OpenWith path={project.path} />
               <Action.Open
                 title={`Open in ${terminal.name}`}
                 target={project.path}
                 application={terminal}
                 icon={{ fileIcon: terminal.path }}
               />
-              <Action.Open title="Open Project Directory" target={projectDirectory} />
               <Action.CopyToClipboard
                 title="Copy Project Path"
                 content={project.path}
                 shortcut={Keyboard.Shortcut.Common.Copy}
               />
-              <Action.CopyToClipboard
-                title="Copy Project Name"
-                content={basename(project.path)}
-              />
+              <Action.CopyToClipboard title="Copy Project Name" content={basename(project.path)} />
+              <Action.Trash paths={project.path} shortcut={Keyboard.Shortcut.Common.Remove} onTrash={refresh} />
             </ActionPanel>
           }
         />
